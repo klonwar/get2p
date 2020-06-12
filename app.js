@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
-const root = path.join(__dirname, 'public/dist');
+const root = path.join(__dirname, 'public/frontend/dist');
 app.use(express.static(root));
 
 app.use(cors(), (req, res, next) => {
@@ -43,7 +43,6 @@ app.use(cors(), (req, res, next) => {
 
 app.use('/api/v1', sendRouter);
 
-
 // error handler
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
@@ -56,5 +55,6 @@ app.use(function (err, req, res, next) {
 });
 
 app.use(fallback(`index.html`, {root}));
+
 
 module.exports = app;

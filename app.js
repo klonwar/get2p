@@ -29,7 +29,11 @@ app.use(cors(), (req, res, next) => {
       res.header("Access-Control-Allow-Origin", `http://${hostname}:1337`);
       break;
     case `get2p.herokuapp.com`:
-      res.header("Access-Control-Allow-Origin", `http://${hostname}`);
+      if (req.get(`protocol`) === `http`) {
+        res.header("Access-Control-Allow-Origin", `http://${hostname}`);
+      } else {
+        res.header("Access-Control-Allow-Origin", `https://${hostname}`);
+      }
       break;
     default:
       res.header("Access-Control-Allow-Origin", null)

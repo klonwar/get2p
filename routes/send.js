@@ -62,20 +62,16 @@ router.get(`/request/:token/`, async (req, res, next) => {
     });
 
     const text = (await response.text());
-    const rawCookies = cookieParser.parse(response.headers.raw()[`set-cookie`]);
-
-    for (let item of rawCookies) {
-      const {name, value, ...rest} = item;
-      res.cookie(name, value, {...rest, domain: `.` + url.hostname, secure: true});
-    }
+    const rawCookies = response.headers.raw()[`set-cookie`];
 
     try {
       JSON.parse(text);
-      res.send(JSON.stringify({type: `json`, data: text}));
+      res.send(JSON.stringify({type: `json`, data: text, cookies: rawCookies}));
     } catch (e) {
-      res.send(JSON.stringify({type: `text`, data: text}));
+      res.send(JSON.stringify({type: `text`, data: text, cookies: rawCookies}));
     }
   } catch (e) {
+    console.error(e);
     res.status(500).send(undefined);
   }
 });

@@ -40,6 +40,12 @@ router.get(`/favicon/:domain/`, async (req, res, next) => {
 router.get(`/request/:token/`, async (req, res, next) => {
   try {
     const {link, credentials = `include`, method = `GET`, body, headers} = decrypt(req.params.token);
+    let jsonHeaders;
+    try {
+      jsonHeaders = JSON.parse(headers);
+    } catch (e) {
+      jsonHeaders = {};
+    }
     const url = new URL(link);
     const autoHeaders = {};
     if (body && (method !== `GET`)) {
@@ -50,18 +56,21 @@ router.get(`/request/:token/`, async (req, res, next) => {
         autoHeaders[`content-type`] = `application/x-www-form-urlencoded`;
       }
     }
+    const finalHeaders = {
+      ...autoHeaders,
+      ...jsonHeaders
+    };
 
     const response = await fetch(link, {
       credentials,
       method,
       body: (method !== `GET`) ? body : undefined,
-      headers: {
-        ...autoHeaders,
-        ...headers
-      }
+      headers: finalHeaders
     });
 
     const text = (await response.text());
+    console.log(JSON.stringify(finalHeaders));
+
     const rawCookies = response.headers.raw()[`set-cookie`];
 
     try {

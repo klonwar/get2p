@@ -15,25 +15,27 @@ const http = require('http');
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || '443');
+const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
  * Create HTTPS server.
  */
 
-const httpServer = http.createServer(app);
-
-const server = https.createServer({
+// const httpServer = http.createServer(app);
+/*
+{
   key: fs.readFileSync(path.join(__dirname, 'security/cert.key')),
   cert: fs.readFileSync(path.join(__dirname, 'security/cert.pem')),
-}, app);
+},
+*/
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-httpServer.listen(80);
+// httpServer.listen(80);
 server.listen(port);
 
 server.on('error', onError);

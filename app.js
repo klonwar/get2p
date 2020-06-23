@@ -7,15 +7,18 @@ const logger = require('morgan');
 const fallback = require('express-history-api-fallback');
 
 const sendRouter = require('./routes/send');
+const env = process.env.NODE_ENV;
 
 const app = express();
 
-app.use((req, res, next) => {
-  if(!req.secure) {
-    res.redirect(`https://${req.headers.host}${req.url}`);
-  }
-  next();
-});
+if (env === 'production') {
+  app.use((req, res, next) => {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      res.redirect(`https://${req.headers.host}${req.url}`);
+    }
+    next();
+  });
+}
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

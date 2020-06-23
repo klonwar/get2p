@@ -10,6 +10,13 @@ const sendRouter = require('./routes/send');
 
 const app = express();
 
+app.use((req, res, next) => {
+  if(!req.secure) {
+    res.redirect(`https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -21,7 +28,6 @@ app.use(cookieParser());
 
 const root = path.join(__dirname, 'public/frontend/dist');
 app.use(express.static(root));
-
 app.use(cors(), (req, res, next) => {
   const hostname = req.get('host').split(`:`)[0];
   switch (hostname) {

@@ -2,11 +2,13 @@ const createError = require('http-errors');
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const fallback = require('express-history-api-fallback');
 
-const sendRouter = require('./routes/send');
+const apiRouter = require('./routes/apiRouter');
+
 const env = process.env.NODE_ENV;
 
 const app = express();
@@ -54,7 +56,7 @@ app.use(cors(), (req, res, next) => {
   next();
 });
 
-app.use('/api/v1', sendRouter);
+app.use('/api/v1', apiRouter);
 
 // error handler
 app.use(function (err, req, res, next) {

@@ -122,7 +122,6 @@ const Send = (props) => {
   // Получение фавиконки при существующем токене
   useEffect(() => {
     if (!isUndefined(error) && !error && token) {
-      console.log(error);
       const sendProps = fromToken(token);
       const url = new URL(sendProps.link);
       const {protocol, hostname} = url;

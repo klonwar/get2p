@@ -18,7 +18,7 @@ const FavoriteButton = (props) => {
   return (
     <button className={`uk-padding-small`} onClick={() => {
       // setFavorite(!isFavorite);
-      if (favorite?.[token]) {
+      if (favorite?.[token] || favorite?.[uuid]) {
         removeFromFavorite({token, uuid}, () => favoriteFromStorage());
       } else {
         addToFavorite({token, uuid}, () => favoriteFromStorage());

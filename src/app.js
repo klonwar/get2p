@@ -19,8 +19,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 
-const root = path.join(__dirname, 'public/frontend/dist');
-app.use(express.static(root));
 
 app.use(cors(), (req, res, next) => {
   const hostname = req.get('host').split(`:`)[0];
@@ -56,6 +54,9 @@ app.use(function (err, req, res, next) {
   next();
 });
 
+
+const root = path.join(__dirname, 'public/frontend/dist');
+app.use(express.static(root));
 app.use(fallback(`index.html`, {root}));
 
 module.exports = app;

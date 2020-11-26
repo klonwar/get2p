@@ -1,0 +1,16 @@
+.disable-chrome-autocomplete (@text-color, @font-family) {
+  input:-webkit-autofill {
+    &,
+    &::first-line,
+    &:hover,
+    &:focus,
+    &:active {
+      transition-delay: 9999s;
+      transition-property: background-color;
+
+      -webkit-text-fill-color: @text-color;
+      font-family: @font-family !important;
+      font-size: initial;
+    }
+  }
+}

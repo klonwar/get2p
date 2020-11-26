@@ -1,0 +1,35 @@
+{
+  "data": {
+    "name": "SUPERUSER",
+    "role": "admin"
+  },
+  "status": 200,
+  "statusText": "OK",
+  "headers": {
+    "content-length": "35",
+    "content-type": "application/json; charset=utf-8"
+  },
+  "config": {
+    "url": "/login",
+    "visibilityTrigger": "post",
+    "data": "{\"login\":\"Admin\",\"password\":\"admin123\"}",
+    "headers": {
+      "Accept": "application/json, text/plain, *!/!*",
+      "Content-Type": "application/json"
+    },
+    "baseURL": "http://localhost:3000/api/v1",
+    "transformRequest": [
+      null
+    ],
+    "transformResponse": [
+      null
+    ],
+    "timeout": 10000,
+    "withCredentials": true,
+    "xsrfCookieName": "XSRF-TOKEN",
+    "xsrfHeaderName": "X-XSRF-TOKEN",
+    "maxContentLength": -1
+  },
+  "request": {},
+  "ok": true
+}

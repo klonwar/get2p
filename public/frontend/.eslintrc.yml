@@ -1,0 +1,30 @@
+env:
+    es6: true
+    browser: true
+    commonjs: true
+
+extends: ['htmlacademy/es6', 'plugin:react-hooks/recommended', 'plugin:react/recommended']
+
+parser: 'babel-eslint'
+
+parserOptions:
+    ecmaFeatures:
+        jsx: true
+    ecmaVersion: 2019
+    sourceType: module
+
+    plugins: ['react']
+    babelOptions:
+        configFile: 'babel.config.json'
+
+settings:
+    react:
+        version: '16'
+
+rules:
+    indent: off
+    no-trailing-spaces: off
+    no-console: off
+    no-invalid-this: off
+    no-return-assign: off
+    react-hooks/exhaustive-deps: warn

@@ -28,10 +28,6 @@ app.use(_express.default.urlencoded({
   extended: false
 }));
 app.use((0, _cookieParser.default)());
-
-const root = _path.default.join(__dirname, 'public/frontend/dist');
-
-app.use(_express.default.static(root));
 app.use((0, _cors.default)(), (req, res, next) => {
   const hostname = req.get('host').split(`:`)[0];
 
@@ -64,6 +60,10 @@ app.use(function (err, req, res, next) {
   res.render('error');
   next();
 });
+
+const root = _path.default.join(__dirname, 'public/frontend/dist');
+
+app.use(_express.default.static(root));
 app.use((0, _expressHistoryApiFallback.default)(`index.html`, {
   root
 }));

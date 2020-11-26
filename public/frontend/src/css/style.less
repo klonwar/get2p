@@ -1,0 +1,130 @@
+@import "../../node_modules/uikit/src/less/uikit.theme.less";
+@import "chrome-autocomplete";
+@import "json-highlighting";
+
+// My variables
+
+@red: #F44336;
+@orange: #FF5722;
+@green: #4CAF50;
+@text-color: #333;
+@font-family: "Fira Code", monospace;
+
+// UiKit override
+
+@global-danger-background: @red;
+@global-warning-background: @orange;
+@global-success-background: @green;
+@global-font-family: @font-family;
+
+html {
+  font-family: @font-family;
+  color: @text-color;
+  overflow: hidden;
+  user-select: none;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+@keyframes blink {
+  50% {background-color: @red}
+}
+
+.error-card {
+  animation-name: blink;
+  animation-duration: 1s;
+}
+
+.uk-accordion-title {
+  font-size: initial;
+}
+
+.input-hint {
+  opacity: 75%;
+  display: none;
+  z-index: @tooltip-z-index;
+  box-sizing: border-box;
+  max-width: 2*@tooltip-max-width;
+  padding: @tooltip-padding-vertical @tooltip-padding-horizontal;
+  background: @tooltip-background;
+  border-radius: @tooltip-border-radius;
+  color: @tooltip-color;
+  font-size: @tooltip-font-size;
+  .hook-tooltip;
+}
+
+/* Show */
+.input-hint.uk-active { display: block; }
+
+.disable-chrome-autocomplete(@text-color, @font-family);
+
+.code-block {
+  user-select: text;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.card-link {
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.favorite-label {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.text-img {
+  filter: grayscale(1) opacity(0.4);
+}
+
+.red-closing-sign:hover {
+  color: @global-danger-background;
+}
+
+.method-span {
+  position: absolute;
+  bottom: 50%;
+  font-size: 8pt;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+.secondary-background {
+  background-color: @global-secondary-background;
+}
+
+a.active {
+  color: @global-secondary-background;
+}
+
+textarea.uk-input {
+  height: auto;
+}
+
+.json-textarea {
+  line-height: 24px !important;
+  padding: 5px 0;
+  resize: vertical;
+}
+
+.uk-form-icon:not(.uk-form-icon-flip) ~ .uk-textarea {
+  padding-left: 40px !important;
+}
+
+.module-line > div {
+  border: 1px solid #333;
+}
+
+.overlay-spinner {
+  transition: 1s ease-in-out;
+  z-index: 9999;
+  background-color: #ffffff;
+}

@@ -10,7 +10,7 @@ const app = express();
 
 // HTTPS only
 app.use((req, res, next) => {
-  if (!req.secure) {
+  if (!req.secure && req.headers['x-forwarded-proto'] !== 'https') {
     res.redirect(`https://${req.headers.host}${req.url}`);
   }
   next();

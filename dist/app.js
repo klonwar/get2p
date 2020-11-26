@@ -19,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 const app = (0, _express.default)(); // HTTPS only
 
 app.use((req, res, next) => {
-  if (!req.secure) {
+  if (!req.secure && req.headers['x-forwarded-proto'] !== 'https') {
     res.redirect(`https://${req.headers.host}${req.url}`);
   }
 

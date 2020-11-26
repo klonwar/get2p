@@ -3,7 +3,8 @@ import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
 import fallback from 'express-history-api-fallback';
-import apiRouter from "./routes/api-router"
+import apiRouter from "./routes/api-router";
+import appRoot from "app-root-path";
 
 const app = express();
 
@@ -55,7 +56,7 @@ app.use(function (err, req, res, next) {
 });
 
 
-const root = path.join(__dirname, 'public/frontend/dist');
+const root = path.join(appRoot + ``, 'public/frontend/dist');
 app.use(express.static(root));
 app.use(fallback(`index.html`, {root}));
 

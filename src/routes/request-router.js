@@ -42,9 +42,9 @@ requestRouter.get(`/:token/`, handler(async (req, res) => {
 
   try {
     JSON.parse(text);
-    res.send(JSON.stringify({type: `json`, data: escape(text), cookies: rawCookies}));
+    res.send(JSON.stringify({type: `json`, data: text, cookies: rawCookies}));
   } catch (e) {
-    res.send(JSON.stringify({type: `text`, data: escape(text), cookies: rawCookies}));
+    res.send(JSON.stringify({type: `text`, data: text, cookies: rawCookies}));
   }
 }));
 

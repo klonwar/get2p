@@ -7,18 +7,26 @@ const prod = process.env.NODE_ENV === `production`;
 
 const uuidRouter = express.Router();
 
-const dbConfig = (prod)
-  ? {
-    host: process.env.CLEARDB_DATABASE_URL,
-    user: `b71c1229540546`,
-    password: `2509393d`,
-    database: `heroku_697aa784bcd3e5d`
-  } : {
+// mysql://b71c1229540546:2509393d@eu-cdbr-west-03.cleardb.net/heroku_697aa784bcd3e5d?reconnect=true
+
+let dbConfig;
+if (prod) {
+  const url = process.env.CLEARDB_DATABASE_URL;
+  const res = url.matchAll(/mysql:\/\/([a-zA-Z0-9]+):([a-zA-Z0-9]+)@([a-zA-Z0-9_\-\.]+)\/([a-zA-Z0-9_\-\.]+)/g)[0];
+  dbConfig = {
+    host: res[2],
+    user: res[0],
+    password: res[1],
+    database: res[3]
+  };
+} else {
+  dbConfig = {
     host: `127.0.0.1`,
     user: `root`,
     password: `root`,
     database: `get2p`
   };
+}
 
 
 const db = require(`knex`)({

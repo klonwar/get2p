@@ -4,7 +4,6 @@ import path from 'path';
 import cookieParser from 'cookie-parser';
 import fallback from 'express-history-api-fallback';
 import apiRouter from "./routes/api-router"
-import logger from "morgan";
 
 const app = express();
 
@@ -16,7 +15,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());

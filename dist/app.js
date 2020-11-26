@@ -12,8 +12,6 @@ var _expressHistoryApiFallback = _interopRequireDefault(require("express-history
 
 var _apiRouter = _interopRequireDefault(require("./routes/api-router"));
 
-var _morgan = _interopRequireDefault(require("morgan"));
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const app = (0, _express.default)(); // HTTPS only
@@ -25,7 +23,6 @@ app.use((req, res, next) => {
 
   next();
 });
-app.use((0, _morgan.default)('dev'));
 app.use(_express.default.json());
 app.use(_express.default.urlencoded({
   extended: false

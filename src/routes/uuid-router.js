@@ -12,12 +12,12 @@ const uuidRouter = express.Router();
 let dbConfig;
 if (prod) {
   const url = process.env.CLEARDB_DATABASE_URL;
-  const res = url.matchAll(/mysql:\/\/([a-zA-Z0-9]+):([a-zA-Z0-9]+)@([a-zA-Z0-9_\-\.]+)\/([a-zA-Z0-9_\-\.]+)/g)[0];
+  const res = url.match(/mysql:\/\/([a-zA-Z0-9]+):([a-zA-Z0-9]+)@([a-zA-Z0-9_\-\.]+)\/([a-zA-Z0-9_\-\.]+)/);
   dbConfig = {
-    host: res[2],
-    user: res[0],
-    password: res[1],
-    database: res[3]
+    host: res[3],
+    user: res[1],
+    password: res[2],
+    database: res[4]
   };
 } else {
   dbConfig = {

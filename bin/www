@@ -2,16 +2,22 @@
 
 const app = require('../app');
 const chalk = require('chalk');
+const http = require('http');
 const https = require('https');
 const fs = require('fs');
 
-const port = process.env.PORT || 3000;
+const prod = process.env.NODE_ENV === `production`;
+
+const port = (prod) ? process.env.PORT : 3000;
 app.set('port', port);
 
-const server = https.createServer({
-  key: fs.readFileSync(`./bin/security/cert.key`),
-  cert: fs.readFileSync(`./bin/security/cert.pem`)
-}, app);
+
+const server = (prod)
+  ? http.createServer(app)
+  : https.createServer({
+    key: fs.readFileSync(`./bin/security/cert.key`),
+    cert: fs.readFileSync(`./bin/security/cert.pem`)
+  }, app);
 
 server.listen(port);
 console.log(chalk.green(`-@ Server is running on https://localhost:${port}`));

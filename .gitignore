@@ -1,5 +1,4 @@
 .idea
 node_modules
 package-lock.json
-public/frontend/dist
-dist/
+./dist/

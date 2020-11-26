@@ -5,7 +5,7 @@
   "scripts": {
     "start": "npm run build && node ./bin/www",
     "watch": "nodemon -e js,json -w ./src --exec \"npm run start\"",
-    "build": "babel ./src/ -d ./dist/ && npm i --prefix public/frontend && npm run build --prefix public/frontend"
+    "build": "babel ./src/ -d ./dist/ && npm run build --prefix public/frontend"
   },
   "dependencies": {
     "chalk": "^4.1.0",

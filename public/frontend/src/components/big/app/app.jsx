@@ -10,11 +10,12 @@ import Help from "#components/big/help/help";
 import ATC from "#components/big/atc/atc";
 import Wrapper from "#components/medium/wrapper/wrapper";
 import Modules from "#components/big/modules/modules";
+import Instant from "#components/big/instant/instant";
 
 const App = () => {
   return (
     <Switch>
-      <Route exact path={`/send`}>
+      <Route exact path={`/send/:payload`}>
         <Send />
       </Route>
 
@@ -26,9 +27,9 @@ const App = () => {
         <ATC />
       </Route>
 
-      <Route exact path={`/modules`}>
+      <Route exact path={`/instant`}>
         <Wrapper>
-          <Modules />
+          <Instant />
         </Wrapper>
       </Route>
 

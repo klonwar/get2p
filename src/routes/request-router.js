@@ -29,6 +29,8 @@ requestRouter.get(`/:token/`, handler(async (req, res) => {
     ...jsonHeaders
   };
 
+  console.log(finalHeaders);
+
   const response = await fetch(link, {
     credentials,
     method,

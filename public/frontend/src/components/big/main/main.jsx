@@ -24,6 +24,9 @@ import {UuidActions} from "#src/js/redux/reducers/slices/uuid-slice";
 import SpinnerWrapper from "#components/medium/spinner-wrapper/spinner-wrapper";
 import OverlaySpinner from "#components/medium/spinner-wrapper/overlay-spinner";
 import UIkit from "uikit";
+import SendForm from "#components/medium/send-form/send-form";
+import SendInputs from "#components/medium/send-form/send-inputs";
+import SendButtons from "#components/medium/send-form/send-buttons";
 
 const renderFavorite = (favorite, favoriteFromStorage) => {
   if (!favorite || Object.keys(favorite).length === 0) {
@@ -70,15 +73,15 @@ const renderFavorite = (favorite, favoriteFromStorage) => {
 
 const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavicon, getUuid, removeUuid}) => {
   const history = useHistory();
-  const [buff, setBuff] = useState(false);
+  const [isBuffWritting, setBuffWritting] = useState(false);
   const [tokenData, setTokenData] = useState(undefined);
 
-  const memoizedProcessData = useCallback(({data, link, uuid}) => {
+  const handleFormResponse = useCallback(({data, link, uuid}) => {
     if (data.type === `clipboard`) {
-      setBuff(true);
+      setBuffWritting(true);
       navigator.clipboard.writeText(location.origin + link).then(() => {
         setTimeout(() => {
-          setBuff(false);
+          setBuffWritting(false);
         }, 500);
       });
     } else if (data.type === `send`) {
@@ -101,29 +104,33 @@ const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavi
 
     setTokenData({token, decrypted});
 
-    let link = `/send?token=` + token;
-
+    // Хотим короткую ссылку - генерируем
     if (data.shortLink) {
       getUuid(token);
       return false;
     }
 
-    memoizedProcessData({data, link});
+    handleFormResponse({data, link: `/send/` + token});
 
     return true;
   };
 
 
   useEffect(() => {
+    // UUID сгенерировался
     if (tokenData?.token && uuids?.[tokenData.token]) {
       if (uuids[tokenData.token].ok) {
-        memoizedProcessData({data: tokenData.decrypted, link: `/send?uuid=${uuids[tokenData.token].uuid}`, uuid: uuids[tokenData.token].uuid});
+        handleFormResponse({
+          data: tokenData.decrypted,
+          link: `/send/${uuids[tokenData.token].uuid}`,
+          uuid: uuids[tokenData.token].uuid
+        });
       } else {
         UIkit.notification(uuids[tokenData.token].error || ``, {pos: `bottom-right`, status: `danger`, timeout: 1500});
       }
       removeUuid(tokenData.token);
     }
-  }, [tokenData, uuids, memoizedProcessData, removeUuid]);
+  }, [tokenData, uuids, handleFormResponse, removeUuid]);
 
   return (
     <>
@@ -134,197 +141,11 @@ const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavi
             {renderFavorite(favorite, favoriteFromStorage)}
           </>
 
-          <Form onSubmit={onSubmit}
-                mutators={{
-                  toggleMethod: (args, state, utils) => {
-                    utils.changeValue(state, `method`, (method) => (method === `GET`) ? `POST` : `GET`);
-                  },
-                  toggleRedirect: (args, state, utils) => {
-                    utils.changeValue(state, `redirect`, (redirect) => !redirect);
-                  },
-                  toggleHandlerType: (args, state, utils) => {
-                    utils.changeValue(state, `handlerType`, (handlerType) => (handlerType === `server`) ? `client` : `server`);
-                  }
-                }}
-                render={({handleSubmit, submitting, values, form}) => (
-                  <>
-                    <div className={`uk-width-1-2@m`}>
-                      <form onSubmit={handleSubmit} id={`send-form`}>
+          <SendForm
+            onSubmit={onSubmit}
+            isBuffWritting={isBuffWritting}
+          />
 
-                        <div className={`uk-card uk-card-body uk-card-default uk-text-left`}>
-                          <h3 className={`uk-card-title uk-position-relative`}>
-                            <span>Новый запрос</span>
-                            <Link to={`/help`}
-                                  className={`uk-badge secondary-background uk-position-center-right`}>?</Link>
-                          </h3>
-                          <div className={`uk-flex uk-flex-center uk-flex-column uk-child-width-1-1`}
-                               uk-margin={`margin: uk-margin-top`}>
-                            <div className={`uk-flex`}>
-                              <SwitchField name={`method`} firstCheckbox={{
-                                initialValue: `GET`,
-                                value: `GET`
-                              }} secondCheckbox={{
-                                value: `POST`
-                              }} clickHandler={form.mutators.toggleMethod}
-                                           visibilityTrigger={!values.method || values.method === `GET`} />
-
-                              <div className={`uk-width-expand`}>
-                                <Field name={`link`} disabled={submitting} type={`text`} icon={`forward`}
-                                       placeholder={`http://example.com/login/${(!values.method || values.method === `GET`) ? `?foo=bar&bar=foo` : ``}`}
-                                       validate={linkValidator} autofocus={false}>
-                                  {createInput}
-                                </Field>
-                              </div>
-                            </div>
-
-                            {(() => {
-                              if (!values.method || values.method === `GET`) {
-                                return undefined;
-                              }
-
-                              return (
-                                <FlexGroup>
-                                  <Field name={`body`} disabled={submitting} type={`text`} icon={`link`}
-                                         placeholder={`foo=bar&bar=foo`}>
-                                    {createInput}
-                                  </Field>
-                                </FlexGroup>
-                              );
-                            })()}
-
-                            <ul className={`uk-margin-remove-bottom`} uk-accordion={``}>
-                              <li>
-                                <a className={`uk-accordion-title uk-text-secondary`} href={`#`}>Дополнительно</a>
-                                <div className={`uk-accordion-content`}>
-                                  <FlexM>
-                                    <div className={`uk-width-1-1`} uk-margin={``}>
-                                      <SwitchField className={`uk-width-expand`} name={`handlerType`}
-                                                   firstCheckbox={{
-                                                     initialValue: `server`,
-                                                     value: `server`,
-                                                     label: `Server side`
-                                                   }}
-                                                   secondCheckbox={{
-                                                     value: `client`,
-                                                     label: `Client side`
-                                                   }}
-                                                   clickHandler={form.mutators.toggleHandlerType}
-                                                   visibilityTrigger={!values.handlerType || values.handlerType === `server`} />
-
-
-                                      <Field name={`headers`} disabled={submitting} type={`text`} icon={`cog`}
-                                             placeholder={`{\n  "accept": "application/json"\n}`}
-                                             validate={headersValidator} textarea={3} className={`json-textarea`}>
-                                        {createInput}
-                                      </Field>
-                                      <div className={`uk-flex`}>
-                                        <div className={`uk-width-expand`}>
-                                          <Field name={`redirectTo`} disabled={submitting} type={`text`}
-                                                 icon={`future`}
-                                                 placeholder={`http://example.com/main/`}>
-                                            {createInput}
-                                          </Field>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    <FlexM>
-                                      <div>
-                                        <label>
-                                          <Field initialValue={true} name={`credentials`} component={`input`}
-                                                 type={`checkbox`}
-                                                 className={`uk-checkbox`} />
-                                          {` `}Credentials
-                                        </label>
-                                      </div>
-                                      {
-                                        (values.handlerType && values.handlerType !== `server`) ? (
-                                          <div>
-                                            <label>
-                                              <Field initialValue={true} name={`noCorsMode`} component={`input`}
-                                                     type={`checkbox`}
-                                                     className={`uk-checkbox`} />
-                                              {` `}No-cors
-                                            </label>
-                                          </div>
-                                        ) : undefined
-                                      }
-                                      <div>
-                                        <label>
-                                          <Field initialValue={true} name={`shortLink`} component={`input`}
-                                                 type={`checkbox`}
-                                                 className={`uk-checkbox`} />
-                                          {` `}Короткая ссылка
-                                        </label>
-                                      </div>
-                                    </FlexM>
-                                  </FlexM>
-                                </div>
-                              </li>
-                            </ul>
-                          </div>
-
-                        </div>
-
-                      </form>
-                    </div>
-
-                    <ChildrenDuplicator
-                      firstProps={{
-                        "className": `uk-width-1-4@m uk-flex uk-flex-column uk-flex-around uk-visible@m`,
-                        "uk-margin": ``
-                      }}
-                      secondProps={{
-                        "className": `uk-width-1-4@m uk-flex uk-flex-between uk-hidden@m`,
-                        "uk-margin": ``
-                      }}
-                    >
-                      <div>
-                        <button type={`submit`} form={`send-form`} onClick={(e) => {
-                          form.change(`type`, `send`);
-                          if (e.ctrlKey) {
-                            form.change(`type`, `send-new-window`);
-                          }
-                        }} onMouseDown={(e) => {
-                          if (e.button === 1) {
-                            form.change(`type`, `send-new-window`);
-                            handleSubmit(e);
-                          }
-                        }} className={`uk-button uk-button-primary`}>
-                        <span className={`uk-visible@s`}>
-                          Отправить
-                        </span>
-                          <span className={`uk-hidden@s`} uk-icon={`icon: forward`} />
-                        </button>
-                      </div>
-                      <div>
-                        <button type={`submit`} form={`send-form`} onClick={() => {
-                          form.change(`type`, `favorite`);
-                        }} className={`uk-button uk-position-relative`}>
-                        <span className={`uk-visible@s`}>
-                          В избранное
-                        </span>
-                          <span className={`uk-hidden@s`} uk-icon={`icon: star`} />
-                        </button>
-                      </div>
-                      <div>
-                        <button type={`submit`} form={`send-form`} disabled={!window.isSecureContext} onClick={() => {
-                          form.change(`type`, `clipboard`);
-                        }}
-                                className={`uk-button uk-position-relative`} {...((buff) ? {style: {backgroundColor: `#8BC34A`}} : {})}>
-                        <span className={((buff) ? `uk-invisible` : ``)}>
-                          <span className={`uk-visible@s`}>
-                          В буфер обмена
-                        </span>
-                        <span className={`uk-hidden@s`} uk-icon={`icon: pull`} />
-                        </span>
-                          <span className={`${((!buff) ? `uk-invisible` : ``)} uk-position-center`}
-                                uk-icon={`icon: check`} />
-                        </button>
-                      </div>
-                    </ChildrenDuplicator>
-
-                  </>
-                )} />
         </div>
 
       </div>

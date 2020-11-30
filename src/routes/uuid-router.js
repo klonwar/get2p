@@ -7,8 +7,6 @@ const prod = process.env.NODE_ENV === `production`;
 
 const uuidRouter = express.Router();
 
-// mysql://b71c1229540546:2509393d@eu-cdbr-west-03.cleardb.net/heroku_697aa784bcd3e5d?reconnect=true
-
 let dbConfig;
 if (prod) {
   const url = process.env.CLEARDB_DATABASE_URL;

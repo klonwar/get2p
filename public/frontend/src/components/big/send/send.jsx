@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, withRouter} from "react-router-dom";
 import {addToFavorite, highlightJSON, StorageHelper} from "#src/js/functions";
 import {decrypt} from "#src/js/crypto";
 import {connect} from "react-redux";
@@ -65,7 +65,7 @@ const renderCodeLabel = (code) => {
 
 const Send = (props) => {
   const location = useLocation();
-  const {code, message, favicons, favorite, tokensFromUUID} = props;
+  const {match, code, message, favicons, favorite, tokensFromUUID} = props;
   const {sendRequest, clearResponse, getFavicon, getToken, removeToken} = props;
 
   const [error, setError] = useState(undefined);
@@ -80,11 +80,12 @@ const Send = (props) => {
 
   // В самом начале получение токена и uuid из url
   useEffect(() => {
-    const tokenFromUrl = (new URLSearchParams(location.search)).get(`token`);
-    const uuidFromUrl = (new URLSearchParams(location.search)).get(`uuid`);
+    const payload = match.params.payload;
+    const uuidFromUrl = payload.match(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/)?.[0] || ``;
+    const tokenFromUrl = (uuidFromUrl) ? `` : payload;
 
-    setToken(tokenFromUrl || ``);
-    setUuid(uuidFromUrl || ``);
+    setToken(tokenFromUrl);
+    setUuid(uuidFromUrl);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -218,6 +219,7 @@ Send.propTypes = {
   favorite: PropTypes.object,
   tokensFromUUID: PropTypes.object,
   code: PropTypes.number,
+  match: PropTypes.object,
   message: PropTypes.string,
   sendRequest: PropTypes.func.isRequired,
   clearResponse: PropTypes.func.isRequired,
@@ -244,4 +246,4 @@ const mapDispatchToProps = (dispatch) => ({
   favoriteFromStorage: () => dispatch(FavoriteActions.favoriteFromStorage(undefined)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Send);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Send));

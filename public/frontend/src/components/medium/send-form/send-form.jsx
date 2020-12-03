@@ -1,8 +1,8 @@
 import {Form} from "react-final-form";
 import React from "react";
 import PropTypes from "prop-types";
-import SendButtons from "#components/medium/send-form/send-buttons";
-import SendInputs from "#components/medium/send-form/send-inputs";
+import SendButtons from "#components/medium/send-buttons/send-buttons";
+import SendInputs from "#components/medium/send-inputs/send-inputs";
 
 const SendForm = ({formID = SendForm.defaultID, onSubmit, isBuffWritting}) => {
 
@@ -15,18 +15,21 @@ const SendForm = ({formID = SendForm.defaultID, onSubmit, isBuffWritting}) => {
           render={({handleSubmit, form, values, submitting}) => {
             return (
               <>
-                <SendInputs
-                  handleSubmit={handleSubmit}
-                  submitting={submitting}
-                  formID={formID}
+                <div className={`uk-width-1-2@m`}>
+                  <div className={`uk-card uk-card-body uk-card-default uk-text-left`}>
+                    <SendInputs
+                      handleSubmit={handleSubmit}
+                      submitting={submitting}
+                      formID={formID}
 
-                  currentMethod={values.method || `GET`}
-                  toggleMethod={form.mutators.toggleMethod}
+                      currentMethod={values.method || `GET`}
+                      toggleMethod={form.mutators.toggleMethod}
 
-                  currentHandlerType={values.handlerType || `server`}
-                  toggleHandlerType={form.mutators.toggleHandlerType}
-                />
-
+                      currentHandlerType={values.handlerType || `server`}
+                      toggleHandlerType={form.mutators.toggleHandlerType}
+                    />
+                  </div>
+                </div>
                 <SendButtons
                   formID={formID}
                   handleSubmit={handleSubmit}

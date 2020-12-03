@@ -1,6 +1,6 @@
 import {createAsyncThunk} from "@reduxjs/toolkit";
 import {StorageHelper} from "../functions";
-import {encrypt, decrypt} from "#src/js/crypto";
+import {encrypt, decrypt} from "#src/js/core/crypto";
 import {SERVER_BASE} from "../../../server.config";
 
 export const Operations = {

@@ -17,7 +17,7 @@ const SpinnerWrapper = (props) => {
 
   const inner = (
     <>
-      <span className={`uk-position-center ${(!loading) ? `uk-invisible` : ``}`} uk-spinner={`ratio: ${ratio}`} />
+      <span className={`uk-position-center uk-overflow-hidden ${(!loading) ? `uk-invisible` : ``}`} uk-spinner={`ratio: ${ratio}`} />
       <div className={`uk-flex uk-flex-column uk-flex-middle uk-position-center${(!isError) ? ` uk-hidden` : ``}`}>
         <button className={`uk-button`}
                 onClick={errorHandler} uk-icon={`icon: ${errorIcon}; ratio: ${ratio}`} />

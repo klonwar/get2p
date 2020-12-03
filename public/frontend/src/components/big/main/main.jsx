@@ -1,32 +1,22 @@
 import React, {useState, useEffect, useCallback} from "react";
 import PropTypes from "prop-types";
-import {Form, Field} from "react-final-form";
-import {linkValidator, headersValidator} from "#src/js/validators";
 import {
   addToFavorite,
   createInput,
   removeFromFavorite,
   StorageHelper
 } from "#src/js/functions";
-import {encrypt} from "#src/js/crypto";
 import {Link, useHistory} from "react-router-dom";
-import SwitchField from "#components/small/switch-field/switch-field";
 import {FavoriteActions} from "#src/js/redux/reducers/slices/favorite-slice";
 import {connect} from "react-redux";
 import {favoriteSelector, uuidRequestPendingSelector, uuidsSelector} from "#src/js/redux/selectors";
 import {Operations} from "#src/js/redux/operations";
-import FlexM from "#components/small/flex-m/flex-m";
-import FlexGroup from "#components/small/flex-group/flex-group";
-import render from "less/lib/less/render";
-import ChildrenDuplicator from "#components/small/children-duplicator/children-duplicator";
-import waitFor from "#src/js/wait-for";
 import {UuidActions} from "#src/js/redux/reducers/slices/uuid-slice";
-import SpinnerWrapper from "#components/medium/spinner-wrapper/spinner-wrapper";
 import OverlaySpinner from "#components/medium/spinner-wrapper/overlay-spinner";
 import UIkit from "uikit";
 import SendForm from "#components/medium/send-form/send-form";
-import SendInputs from "#components/medium/send-form/send-inputs";
-import SendButtons from "#components/medium/send-form/send-buttons";
+import {isUndefined} from "uikit/src/js/util";
+import tokenFromFormData from "#src/js/core/functions/token-from-form-data";
 
 const renderFavorite = (favorite, favoriteFromStorage) => {
   if (!favorite || Object.keys(favorite).length === 0) {
@@ -71,66 +61,74 @@ const renderFavorite = (favorite, favoriteFromStorage) => {
   );
 };
 
-const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavicon, getUuid, removeUuid}) => {
+const Main = (props) => {
+  const {
+    favorite,
+    generatedUuids,
+    favoriteFromStorage,
+    uuidRequestPending,
+    getFavicon,
+    getUuid,
+    removeUuid
+  } = props;
   const history = useHistory();
   const [isBuffWritting, setBuffWritting] = useState(false);
-  const [tokenData, setTokenData] = useState(undefined);
+  const [token, setToken] = useState(undefined);
+  const [formData, setFormData] = useState(undefined);
 
-  const handleFormResponse = useCallback(({data, link, uuid}) => {
-    if (data.type === `clipboard`) {
-      setBuffWritting(true);
-      navigator.clipboard.writeText(location.origin + link).then(() => {
-        setTimeout(() => {
-          setBuffWritting(false);
-        }, 500);
-      });
-    } else if (data.type === `send`) {
-      history.push(link);
-    } else if (data.type === `send-new-window` || !data.type) {
-      window.open(`${window.location.origin}${link}`, `_blank`);
-    } else if (data.type === `favorite`) {
-      const url = new URL(data.link);
-      getFavicon(url.protocol, url.hostname);
-      addToFavorite({token: tokenData.token, uuid}, favoriteFromStorage);
+  const memoizedFormDataHandler = useCallback(({uuid, token: providedToken}) => {
+    const link = `/send/${uuid || providedToken || ``}`;
+    switch (formData.type) {
+      case `clipboard`:
+        setBuffWritting(true);
+        navigator.clipboard.writeText(location.origin + link).then(() => {
+          setTimeout(() => {
+            setBuffWritting(false);
+          }, 500);
+        });
+        break;
+      case `send`:
+        history.push(link);
+        break;
+      case `send-new-window`:
+        window.open(`${window.location.origin}${link}`, `_blank`);
+        break;
+      case `favorite`:
+        const url = new URL(formData.link);
+        getFavicon(url.protocol, url.hostname);
+        addToFavorite({providedToken, uuid}, favoriteFromStorage);
+        break;
     }
-  }, [getFavicon, favoriteFromStorage, history, tokenData]);
-
-  const onSubmit = (data) => {
-    const decrypted = {
-      ...data,
-      body: (data.method === `GET`) ? undefined : data.body
-    };
-    const token = encrypt(decrypted);
-
-    setTokenData({token, decrypted});
-
-    // Хотим короткую ссылку - генерируем
-    if (data.shortLink) {
-      getUuid(token);
-      return false;
-    }
-
-    handleFormResponse({data, link: `/send/` + token});
-
-    return true;
-  };
-
+  }, [formData, setBuffWritting, history, getFavicon, favoriteFromStorage]);
 
   useEffect(() => {
-    // UUID сгенерировался
-    if (tokenData?.token && uuids?.[tokenData.token]) {
-      if (uuids[tokenData.token].ok) {
-        handleFormResponse({
-          data: tokenData.decrypted,
-          link: `/send/${uuids[tokenData.token].uuid}`,
-          uuid: uuids[tokenData.token].uuid
-        });
-      } else {
-        UIkit.notification(uuids[tokenData.token].error || ``, {pos: `bottom-right`, status: `danger`, timeout: 1500});
-      }
-      removeUuid(tokenData.token);
+    // Uuid не нужен, обработаем токен
+    if (!isUndefined(formData) && !formData.shortLink && token) {
+      memoizedFormDataHandler({token});
     }
-  }, [tokenData, uuids, handleFormResponse, removeUuid]);
+  }, [memoizedFormDataHandler, token, formData]);
+
+  useEffect(() => {
+    // Получили uuid и теперь его надо обработать
+    const uuid = generatedUuids?.[token]?.uuid;
+    if (formData?.shortLink && uuid) {
+      memoizedFormDataHandler({token, uuid});
+    }
+  }, [memoizedFormDataHandler, generatedUuids, token, formData]);
+
+  useEffect(() => {
+    // Пришел ответ об ошибке во время генерации UUID-a
+    if (token && generatedUuids?.[token]) {
+      if (!generatedUuids[token].ok) {
+        // Сообщим об ошибке
+        UIkit.notification(generatedUuids[token].error || ``, {
+          pos: `bottom-right`,
+          status: `danger`,
+          timeout: 1500
+        });
+      }
+    }
+  }, [token, generatedUuids, removeUuid]);
 
   return (
     <>
@@ -142,7 +140,16 @@ const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavi
           </>
 
           <SendForm
-            onSubmit={onSubmit}
+            onSubmit={(data) => {
+              const encoded = tokenFromFormData(data);
+              setToken(encoded);
+              setFormData(data);
+
+              if (data.shortLink) {
+                getUuid(encoded);
+              }
+            }}
+
             isBuffWritting={isBuffWritting}
           />
 
@@ -156,7 +163,7 @@ const Main = ({favorite, uuids, favoriteFromStorage, uuidRequestPending, getFavi
 
 Main.propTypes = {
   favorite: PropTypes.object,
-  uuids: PropTypes.object,
+  generatedUuids: PropTypes.object,
   uuidRequestPending: PropTypes.bool,
   favoriteFromStorage: PropTypes.func.isRequired,
   getFavicon: PropTypes.func.isRequired,
@@ -166,7 +173,7 @@ Main.propTypes = {
 
 const mapStateToProps = (state) => ({
   favorite: favoriteSelector(state),
-  uuids: uuidsSelector(state),
+  generatedUuids: uuidsSelector(state),
   uuidRequestPending: uuidRequestPendingSelector(state),
 });
 

@@ -15,9 +15,10 @@ import Instant from "#components/big/instant/instant";
 const App = () => {
   return (
     <Switch>
-      <Route exact path={`/send/:payload`}>
-        <Send />
-      </Route>
+      <Route exact path={`/send/:payload`} render={({match}) => (
+        <Send payload={match.params.payload}/>
+      )}/>
+
 
       <Route exact path={`/help`}>
         <Help />

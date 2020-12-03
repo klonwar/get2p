@@ -9,6 +9,7 @@ import {configureStore, getDefaultMiddleware} from "@reduxjs/toolkit";
 import rootReducer from "#src/js/redux/reducers/root-reducer";
 import {Provider} from "react-redux";
 import {FavoriteActions} from "#src/js/redux/reducers/slices/favorite-slice";
+import {Scrollbar} from "react-scrollbars-custom";
 
 (() => {
   UIkit.use(Icons);

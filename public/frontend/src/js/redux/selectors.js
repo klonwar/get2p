@@ -6,4 +6,6 @@ export const favoriteSelector = (state) => state?.favoriteReducer?.favorite;
 
 export const uuidsSelector = (state) => state?.uuidReducer?.uuids;
 export const uuidRequestPendingSelector = (state) => state?.uuidReducer?.pending;
-export const tokensSelector = (state) => state?.uuidReducer?.tokens;
+export const tokensFromUuidsSelector = (state) => state?.uuidReducer?.tokens;
+
+export const instantTokenSelector = (state) => state?.instantReducer?.token;

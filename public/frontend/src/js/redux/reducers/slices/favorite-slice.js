@@ -5,7 +5,7 @@ import {StorageHelper} from "#src/js/functions";
 /**
  * favoriteReducer: {
  *   favorite: {
- *     [token]: {
+ *     [decodedToken]: {
  *
  *     }
  *   }

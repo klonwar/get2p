@@ -1,6 +1,6 @@
 import InputHint from "#components/small/input-hint/input-hint";
 import React from "react";
-import {encrypt, decrypt} from "#src/js/crypto";
+import {encrypt, decrypt} from "#src/js/core/crypto";
 
 const createStorageItem = (storageKey) => ({
   set: (data) => localStorage[storageKey] = encrypt(data),
@@ -53,7 +53,7 @@ export const addToFavorite = ({token, uuid}, next) => {
     labels.push({text: `redirect`});
   }
   StorageHelper.favorite.put(uuid || token, {
-    link: (uuid) ? `/send?uuid=${uuid}` : `/send?token=${token}`,
+    link: `/send/${uuid || token}`,
     name: hostname + pathname + search,
     domain: hostname,
     labels

@@ -1,5 +1,6 @@
+import {decrypt} from "#src/js/core/crypto";
+
 const composeValidators = (...validators) => (value) => validators.reduce((e, validator) => e || validator(value), false);
-const minLength = (length) => (value) => ((value + ``).length >= length) ? undefined : `Минимальная длина: ${length}`;
 const required = (value) => (value ? undefined : `Это поле обязательно`);
 const needJSON = (value) => {
   if (value) {
@@ -18,5 +19,7 @@ const isLink = (value) => {
 
   return undefined;
 };
+
+
 export const linkValidator = composeValidators(required, isLink);
 export const headersValidator = composeValidators(needJSON);

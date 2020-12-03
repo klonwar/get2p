@@ -3,8 +3,8 @@ import {createSlice} from "@reduxjs/toolkit";
 
 /**
  * uuidReducer: {
- *   uuids: {
- *     [token]: {
+ *   generatedUuids: {
+ *     [decodedToken]: {
  *       ok: {boolean},
  *       uuid: {string}
  *     },
@@ -12,7 +12,7 @@ import {createSlice} from "@reduxjs/toolkit";
  *   tokensFromUUID: {
  *     [uuid]: {
  *       ok: {boolean},
- *       token: {string}
+ *       decodedToken: {string}
  *     },
  *   },
  *   errors: {

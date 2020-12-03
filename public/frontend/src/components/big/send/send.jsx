@@ -1,9 +1,14 @@
 import React, {useEffect, useState} from "react";
 import {Link, useLocation, withRouter} from "react-router-dom";
 import {addToFavorite, highlightJSON, StorageHelper} from "#src/js/functions";
-import {decrypt} from "#src/js/crypto";
+import {decrypt} from "#src/js/core/crypto";
 import {connect} from "react-redux";
-import {favoriteSelector, responseCodeSelector, responseMessageSelector, tokensSelector} from "#src/js/redux/selectors";
+import {
+  favoriteSelector,
+  responseCodeSelector,
+  responseMessageSelector,
+  tokensFromUuidsSelector
+} from "#src/js/redux/selectors";
 import SpinnerWrapper from "#components/medium/spinner-wrapper/spinner-wrapper";
 import PropTypes from "prop-types";
 import {SendActions} from "#src/js/redux/reducers/slices/send-slice";
@@ -13,25 +18,38 @@ import FavoriteButton from "#components/small/favorite-button/favorite-button";
 import {FavoriteActions} from "#src/js/redux/reducers/slices/favorite-slice";
 import {UuidActions} from "#src/js/redux/reducers/slices/uuid-slice";
 import {isUndefined} from "uikit/src/js/util";
-import {err} from "#src/js/logger";
+import {err} from "#src/js/core/logger";
+import CodeBlock from "#components/small/code-block/code-block";
+
 
 const fromToken = (token) => {
+  const errResp = (error) => ({error});
   if (!token) {
-    return {error: `Вы не указали токен`};
+    return errResp(`Вы не указали токен`);
   }
 
   let data;
   try {
     data = decrypt(token);
   } catch (e) {
-    return {error: `Перегенерируйте токен`};
+    return errResp(`Перегенерируйте токен`);
+  }
+
+  if (!data.link) {
+    return errResp(`Вы не указали ссылку`);
+  } else {
+    try {
+      const temp = new URL(data.link);
+    } catch (e) {
+      return errResp(`Ссылка указана неверно`);
+    }
   }
 
   if (data.headers) {
     try {
       data.headers = JSON.parse(data.headers);
     } catch (e) {
-      return {error: `Хэдеры должны быть в JSON`};
+      return errResp(`Хэдеры должны быть в JSON`);
     }
   }
 
@@ -64,8 +82,7 @@ const renderCodeLabel = (code) => {
 };
 
 const Send = (props) => {
-  const location = useLocation();
-  const {match, code, message, favicons, favorite, tokensFromUUID} = props;
+  const {payload, code, message, favicons, tokensFromUUID} = props;
   const {sendRequest, clearResponse, getFavicon, getToken, removeToken} = props;
 
   const [error, setError] = useState(undefined);
@@ -78,32 +95,29 @@ const Send = (props) => {
   const [handlerType, setHandlerType] = useState(`server`);
   const [method, setMethod] = useState(`GET`);
 
-  // В самом начале получение токена и uuid из url
+  // Получение токена и uuid
   useEffect(() => {
-    const payload = match.params.payload;
-    const uuidFromUrl = payload.match(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/)?.[0] || ``;
+    const uuidFromUrl = payload?.match(/\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b/)?.[0] || ``;
     const tokenFromUrl = (uuidFromUrl) ? `` : payload;
 
     setToken(tokenFromUrl);
     setUuid(uuidFromUrl);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setError(undefined);
+    setResponse(undefined);
+    setResponseCode(undefined);
+  }, [payload]);
 
   // Проверим на ошибки
   useEffect(() => {
     if ((!token && !isUndefined(token)) && (!uuid && !isUndefined(uuid))) {
       setError(`No token or uuid`);
     }
-  }, [token, uuid, setError]);
-
-  // Если есть токен, но нет uuid-a, то проверим его
-  useEffect(() => {
     if (token) {
       setError(fromToken(token).error || false);
     }
-  }, [token]);
+  }, [token, uuid]);
 
-  // Отправялем запрос на получение токена из uuid (если не задан конкретный token)
+  // Отправялем запрос на получение токена из uuid (если не задан конкретный decodedToken)
   useEffect(() => {
     if (!token && uuid) {
       getToken(uuid);
@@ -160,21 +174,12 @@ const Send = (props) => {
   // Если получчили ответ - запишем его в state
   useEffect(() => {
     if (message) {
-      let jsonMessage;
-      try {
-        jsonMessage = JSON.stringify(JSON.parse(message), null, 2);
-      } catch (e) {
-        jsonMessage = message;
-      }
-      if (jsonMessage) {
-        jsonMessage = highlightJSON(jsonMessage);
-      }
-
-      setResponse(jsonMessage);
+      setResponse(message);
       setResponseCode(code);
       clearResponse();
     }
   }, [message, clearResponse, code]);
+
 
   return (
     <div className={`uk-height-1-1 uk-flex uk-flex-center`}>
@@ -196,7 +201,7 @@ const Send = (props) => {
           {` `}
           <span>You</span>
         </div>
-        <pre className={`code-block`} style={{userSelect: `text`}} dangerouslySetInnerHTML={{__html: response}} />
+        <CodeBlock code={response} />
         <div>
           <Link to={`/`} className={`uk-padding-small`} uk-icon={`icon: home`} />
           <button className={`uk-padding-small`} uk-icon={`icon: refresh`} onClick={() => {
@@ -219,7 +224,7 @@ Send.propTypes = {
   favorite: PropTypes.object,
   tokensFromUUID: PropTypes.object,
   code: PropTypes.number,
-  match: PropTypes.object,
+  payload: PropTypes.string.isRequired,
   message: PropTypes.string,
   sendRequest: PropTypes.func.isRequired,
   clearResponse: PropTypes.func.isRequired,
@@ -231,7 +236,7 @@ Send.propTypes = {
 
 const mapStateToProps = (state) => ({
   code: responseCodeSelector(state),
-  tokensFromUUID: tokensSelector(state),
+  tokensFromUUID: tokensFromUuidsSelector(state),
   message: responseMessageSelector(state),
   favicons: faviconsSelector(state),
   favorite: favoriteSelector(state),

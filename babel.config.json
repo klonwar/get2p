@@ -3,12 +3,9 @@
     [
       "@babel/env",
       {
-        "targets": "> 40%, not dead"
-      }
-    ],
-    [
-      "@babel/react",
-      {
+        "targets": {
+          "node": true
+        }
       }
     ],
     "@babel/preset-typescript"

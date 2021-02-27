@@ -74,7 +74,7 @@ const plugins = () => {
 module.exports = {
   context: path.resolve(__dirname, `src`),
   mode: `development`,
-  entry: [`@babel/polyfill`, path.join(__dirname, `src/index.jsx`)],
+  entry: [`@babel/polyfill`, path.join(__dirname, `src/index.tsx`)],
   output: {
     filename: filename(`js`),
     path: path.resolve(__dirname, `dist`)
@@ -82,16 +82,20 @@ module.exports = {
   resolve: {
     extensions: [
       `.js`,
-      `.jsx`
+      `.jsx`,
+      `.ts`,
+      `.tsx`,
     ],
     alias: {
       "#components": path.resolve(__dirname, `src`, `components`),
-      "#src": path.resolve(__dirname, `src`)
-    }
+      "#src": path.resolve(__dirname, `src`),
+      "#client": path.resolve(__dirname),
+      "#server": path.resolve(__dirname, `..`, `..`),
+    },
   },
   optimization: optimization(),
   devServer: {
-    port: 1337,
+    port: 3001,
     hot: isDev,
     publicPath: `/`,
     historyApiFallback: true,
@@ -113,7 +117,7 @@ module.exports = {
         use: [`file-loader`]
       },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: {
           loader: `babel-loader`

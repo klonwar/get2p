@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "./temp-dist/",
+    "lib": [
+      "esnext"
+    ],
+    "paths": {
+      "#client/*": ["public/frontend/*"]
+    },
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "ESNext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "compilerOptions": {
+      "target": "esnext",
+      "module": "commonjs"
+    }
+  }
+}

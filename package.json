@@ -6,7 +6,9 @@
     "start": "npm run build && node ./bin/www",
     "watch": "nodemon -e js,json,ts -w ./src --exec \"npm run start\"",
     "build": "babel ./src/ -d ./dist/ --extensions .ts,.js --copy-files",
-    "build-frontend": "npm run build --prefix public/frontend"
+    "build-frontend": "npm run build --prefix public/frontend",
+    "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
+    "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;"
   },
   "dependencies": {
     "app-root-path": "^3.0.0",

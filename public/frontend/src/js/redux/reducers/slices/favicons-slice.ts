@@ -17,7 +17,7 @@ const faviconsSlice = createSlice({
   } as FaviconsState,
   reducers: {
     faviconsFromStorage: (state: FaviconsState) => {
-      if (StorageHelper.favicons.list()) {
+      if (StorageHelper.favicons.list()?.favicons) {
         state.favicons = StorageHelper.favicons.list().favicons;
       }
     },

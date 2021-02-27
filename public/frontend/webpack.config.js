@@ -95,7 +95,7 @@ module.exports = {
   },
   optimization: optimization(),
   devServer: {
-    port: 3001,
+    port: 1337,
     hot: isDev,
     publicPath: `/`,
     historyApiFallback: true,

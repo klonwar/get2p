@@ -49,8 +49,12 @@ const favoriteSlice = createSlice({
   } as FavoriteState,
   reducers: {
     favoriteFromStorage: (state: FavoriteState) => {
-      if (StorageHelper.favorite.list()) {
-        state.favorite = StorageHelper.favorite.list().favorite;
+      try {
+        if (StorageHelper.favorite.list()?.favorite) {
+          state.favorite = StorageHelper.favorite.list().favorite;
+        }
+      } catch (e) {
+        state.favorite = {};
       }
     },
     addToFavorite: (state: FavoriteState, action: PayloadAction<TokenUuidPair>) => {

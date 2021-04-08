@@ -1,5 +1,5 @@
 import {HandlerTypeEnum, MethodEnum, Token} from "#server/src/model/token";
-import {SERVER_BASE} from "#client/server.config";
+import {SERVER_BASE} from "#src/config";
 import {RequestRouterResponse} from "#server/src/routes/request-router";
 
 const serverRequest = async (token: Token): Promise<SendRequestOperationResult> => {

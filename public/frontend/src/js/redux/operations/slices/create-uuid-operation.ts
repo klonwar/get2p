@@ -1,4 +1,4 @@
-import {SERVER_BASE} from "#client/server.config";
+import {SERVER_BASE} from "#src/config";
 import {UuidRouterResponse} from "#server/src/routes/uuid-router";
 import {Token} from "#server/src/model/token";
 

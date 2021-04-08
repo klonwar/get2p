@@ -1,6 +1,6 @@
 import fetchMock from "fetch-mock";
 import {Operations} from "#src/js/redux/operations/operations";
-import {SERVER_BASE} from "#client/server.config";
+import {SERVER_BASE} from "#src/config";
 import thunk from "redux-thunk";
 import configureMockStore from "redux-mock-store";
 import { UuidRouterResponse } from "#server/src/routes/uuid-router";

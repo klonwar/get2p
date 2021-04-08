@@ -1,4 +1,4 @@
-import {SERVER_BASE} from "#client/server.config";
+import {SERVER_BASE} from "#src/config";
 import {encrypt} from "#server/src/util/crypto";
 import {FaviconRouterResponse} from "#server/src/routes/favicon-router";
 

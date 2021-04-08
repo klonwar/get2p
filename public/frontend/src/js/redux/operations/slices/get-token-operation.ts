@@ -1,5 +1,5 @@
 import { UuidRouterResponse } from "#server/src/routes/uuid-router";
-import {SERVER_BASE} from "#client/server.config.js";
+import {SERVER_BASE} from "#src/config";
 import {UuidOperationResult} from "#src/js/redux/operations/slices/create-uuid-operation";
 
 const getTokenOperation = async ({uuid}: { uuid: string }): Promise<UuidOperationResult> => {

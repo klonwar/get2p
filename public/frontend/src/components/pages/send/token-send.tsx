@@ -117,7 +117,7 @@ const TokenSend: React.FC<Props> = (props) => {
     }
   }, [error, token, sendRequest]);
 
-  // Если получчили ответ - запишем его в state
+  // Если получили ответ - запишем его в state
   useEffect(() => {
     if (message) {
       setResponse(message);
